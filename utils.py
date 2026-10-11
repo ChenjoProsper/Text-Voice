@@ -9,7 +9,6 @@ def extraire_texte_pdf(chemin_fichier):
             texte += texte_page + "\n"
     return texte
 
-
 from langdetect import detect
 
 def detecte_langue(texte):
@@ -25,7 +24,9 @@ from gtts import gTTS
 def genere_audio(lien):
 
     texte = extraire_texte_pdf(lien)
-    audio = gTTS(text = texte,lang = detecte_langue(texte))
+    langue = detecte_langue(texte)
+    audio = gTTS(text = texte,lang = langue)
+    print(f"-Traitement du fichier: {lien}\n-Langue: {langue}")
     audio.save("sortie.mp3")
     
     print("Audio generer avec succes  !!")
