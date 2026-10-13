@@ -1,0 +1,10 @@
+services:
+  vocelibre:
+    build: .
+    container_name: Text-Voice_app
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./documents:/app/documents
+      - ./static/audio:/app/static/audio
+    restart: unless-stopped

@@ -2,11 +2,7 @@ from flask import Flask,render_template,request
 import utils
 from werkzeug.utils import secure_filename
 import os
-
-Audio_Folder = 'static/audio/'
-Document_folder = 'documents/'
-os.makedirs(Audio_Folder, exist_ok=True)
-os.makedirs(Document_folder, exist_ok=True)
+from utils import Audio_Folder, Document_folder
 
 app = Flask(__name__)
 
@@ -45,16 +41,6 @@ def convertir():
             """
         except Exception as e:
             return f"Erreur lors de la conversion : {e}"
-# @app.route('/tester')
-# def tester_conversion():
-#     test = "Machiavel - Le prince.pdf"
-#     lien = os.path.join(Document_folder, test)
-    
-#     try:
-#         chemin_audio = utils.genere_audio(lien)
-#         return f"Audio généré avec succès ! Fichier disponible : {chemin_audio}"
-#     except Exception as e:
-#         return f"Erreur : {e}"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

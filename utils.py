@@ -3,6 +3,11 @@ from langdetect import detect
 from gtts import gTTS
 import os
 
+Audio_Folder = 'static/audio/'
+Document_folder = 'documents/'
+os.makedirs(Audio_Folder, exist_ok=True)
+os.makedirs(Document_folder, exist_ok=True)
+
 def extraire_texte_pdf(chemin_fichier):
     lecteur = PdfReader(chemin_fichier)
     texte = ""
@@ -20,7 +25,6 @@ def detecte_langue(texte):
         pass
     return langue
 
-from app import Audio_Folder
 
 
 def genere_audio(chemin_pdf, dossier_sortie=Audio_Folder):
@@ -28,14 +32,13 @@ def genere_audio(chemin_pdf, dossier_sortie=Audio_Folder):
     chemin_sortie = os.path.join(dossier_sortie, f"{nom_base}.mp3")
 
 
-# 1. VÉRIFICATION DU CACHE (mp3 ou wav)
+# 1. VÉRIFICATION DU CACHE
     if os.path.exists(chemin_sortie):
         print(f"-> Audio trouvé en cache pour '{nom_base}' ! Aucun appel réseau nécessaire.")
         return chemin_sortie
 
     print(f"-> Aucun cache trouvé. Extraction et génération en cours pour : {chemin_pdf}...")
     print(f"-> Extraction du texte pour : {chemin_pdf}...")
-    texte = extraire_texte_pdf(chemin_pdf)
     texte = extraire_texte_pdf(chemin_pdf)
     print(f"-> Nombre de caractères extraits du PDF : {len(texte)}")
     
@@ -46,7 +49,7 @@ def genere_audio(chemin_pdf, dossier_sortie=Audio_Folder):
     print(f"-> Langue détectée : {langue}")
     
 # 2. Découpage intelligent du texte en morceaux (~1500 caractères max par morceau)
-    max_taille = 10000
+    max_taille = 1500
     morceaux = []
     
     while len(texte) > 0:
@@ -58,7 +61,7 @@ def genere_audio(chemin_pdf, dossier_sortie=Audio_Folder):
         if index == -1:
             index = max_taille
         else:
-            index += 1  # Inclure le point dans le morceau
+            index += 1 
         morceaux.append(texte[:index])
         texte = texte[index:]
 
