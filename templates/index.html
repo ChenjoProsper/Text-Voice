@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VoceLibre – Texte en audio</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:560px;margin:3rem auto;padding:0 1rem;color:#222}
+    .card{border:1px solid #ddd;border-radius:12px;padding:1.5rem}
+    button{background:#2563eb;color:#fff;border:0;border-radius:8px;padding:.6rem 1.2rem;font-size:1rem;cursor:pointer}
+    .erreur{background:#fee2e2;color:#991b1b;padding:.8rem;border-radius:8px;margin-bottom:1rem}
+    input[type=file]{margin:1rem 0;display:block}
+  </style>
+</head>
+<body>
+  <h1>📖 Texte → Audio</h1>
+  <div class="card">
+    {% if erreur %}<div class="erreur">{{ erreur }}</div>{% endif %}
+    <form action="{{ url_for('convertir') }}" method="post" enctype="multipart/form-data">
+      <label for="fichier_pdf">Choisissez un fichier PDF ou TXT :</label>
+      <input type="file" id="fichier_pdf" name="fichier_pdf" accept=".pdf,.txt,application/pdf,text/plain" required>
+      <button type="submit">Convertir en audio</button>
+    </form>
+  </div>
+</body>
+</html>
