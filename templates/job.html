@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conversion en cours…</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:560px;margin:3rem auto;padding:0 1rem;color:#222}
+    .barre{background:#e5e7eb;border-radius:8px;height:18px;overflow:hidden}
+    #rempli{background:#2563eb;height:100%;width:0;transition:width .4s}
+    audio{width:100%;margin:1rem 0}
+    .erreur{background:#fee2e2;color:#991b1b;padding:.8rem;border-radius:8px;margin:1rem 0}
+    button{background:#2563eb;color:#fff;border:0;border-radius:8px;padding:.6rem 1.2rem;font-size:1rem;cursor:pointer}
+    [hidden]{display:none!important}
+  </style>
+</head>
+<body>
+  <h2>🎧 {{ nom }}</h2>
+
+  <div id="encours">
+    <p id="texte">Préparation…</p>
+    <div class="barre"><div id="rempli"></div></div>
+    <p><small>Vous pouvez laisser cette page ouverte : un long livre peut prendre plusieurs minutes.</small></p>
+  </div>
+
+  <div id="termine" hidden>
+    <h3>Conversion réussie ! ✅</h3>
+    <audio id="lecteur" controls></audio>
+    <p><a id="lien" download>⬇ Télécharger le MP3</a></p>
+  </div>
+
+  <div id="echec" hidden>
+    <div class="erreur" id="msg"></div>
+    <button id="reprise" hidden>↻ Reprendre là où ça s'est arrêté</button>
+  </div>
+
+  <p><a href="{{ url_for('Home') }}">← Convertir un autre fichier</a></p>
+
+<script>
+const id = {{ job_id|tojson }};
+const $ = s => document.getElementById(s);
+let timer;
+async function maj() {
+  try {
+    const r = await fetch("{{ url_for('statut', job_id=job_id) }}");
+    const s = await r.json();
+    if (s.etat === "en_cours") {
+      const p = s.total ? Math.round(100 * s.fait / s.total) : 0;
+      $("rempli").style.width = p + "%";
+      $("texte").textContent = s.total ? `Génération : ${s.fait} / ${s.total} parties (${p} %)` : "Analyse du document…";
+    } else if (s.etat === "termine") {
+      clearInterval(timer);
+      $("encours").hidden = true; $("termine").hidden = false;
+      $("lecteur").src = s.url; $("lien").href = s.url;
+    } else if (s.etat === "erreur") {
+      clearInterval(timer);
+      $("encours").hidden = true; $("echec").hidden = false;
+      $("msg").textContent = s.erreur;
+      $("reprise").hidden = !s.reprenable;
+    }
+  } catch (e) { /* serveur momentanément injoignable : on réessaie */ }
+}
+$("reprise").addEventListener("click", async () => {
+  await fetch("{{ url_for('reprendre', job_id=job_id) }}", {method: "POST"});
+  $("echec").hidden = true; $("encours").hidden = false;
+  timer = setInterval(maj, 2000);
+});
+maj(); timer = setInterval(maj, 2000);
+</script>
+</body>
+</html>
